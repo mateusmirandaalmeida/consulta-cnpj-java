@@ -1,0 +1,48 @@
+<html ng-app="app" ng-controller="ctrl">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.0/angular.min.js"></script>
+</head>
+<body>
+<div>
+
+    <label>CNPJ</label><br/>
+    <input type="text" ng-model="cnpj"><br/><br/>
+
+    <label>CAPTCHA</label><br/>
+    <img ng-src="{{image}}" alt=""><br/>
+    <input type="text" ng-model="captcha"><br/><br/>
+
+    <button ng-click="buscaCNPJ(cnpj, captcha)">Buscar</button>
+
+</div>
+
+
+<script>
+    angular.module('app', [])
+        .controller('ctrl', function ($scope, $http) {
+            var cookie = undefined;
+
+            $http.get('http://localhost:8080/cnpj-api/api/cnpj/generate-captcha')
+                    .then(function (response) {
+                        cookie = response.data.cookie;
+                        $scope.image = response.data.captcha;
+                    })
+
+            $scope.buscaCNPJ = function (cnpj, captcha) {
+                $http.get('http://localhost:8080/cnpj-api/api/cnpj', {
+                    params: {
+                        cnpj: cnpj,
+                        captcha: captcha,
+                        cookie: cookie
+                    }
+                })
+                .then(function (response) {
+                    console.log(response);
+                })
+            }
+
+        })
+</script>
+
+</body>
+</html>
